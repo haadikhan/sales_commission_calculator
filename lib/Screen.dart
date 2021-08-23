@@ -1,7 +1,11 @@
-// Sales Commission Calculator) A large company pays its salespeople on a commission basis.
-// The salespeople receive $200 per week plus 9% of their gross sales for that week. For example, a
-// salesperson who sells $5000 worth of merchandise in a week receives $200 plus 9% of $5000, or a
-// total of $650. You’ve been supplied with a list of the items sold by each salesperson. The values of
+// Sales Commission Calculator) A large company pays its salespeople
+// on a commission basis.
+// The salespeople receive $200 per week plus 9% of their gross
+// sales for that week. For example, a
+// salesperson who sells $5000 worth of merchandise in a week
+// receives $200 plus 9% of $5000, or a
+// total of $650. You’ve been supplied with a list of
+// the items sold by each salesperson. The values of
 // these items are as follows:
 // Item Value
 // 1 239.99
@@ -11,8 +15,10 @@
 // Develop a Java application that inputs one salesperson’s items sold for last week and calculates and
 // displays that salesperson’s earnings. There’s no limit to the number of items that can be sold.
 
-import 'package:flutter/material.dart   ';
+import 'package:flutter/material.dart';
+import 'package:sales_commission_calculator/application/screen_bloc/bloc/screen_bloc.dart';
 import 'package:sales_commission_calculator/sales_man.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Screen extends StatefulWidget {
   @override
@@ -31,98 +37,89 @@ class _ScreenState extends State<Screen> {
         title: Text('Sales commission  calculator'),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          _enterSalaryTextField(),
-          _enterItemSoldTextField(),
-          const SizedBox(height: 20),
-          _addEntryButton(),
-          _commissionText(),
-          // _showItemPrices(),
-          _totalAmountOfItems(),
-          const SizedBox(height: 20),
-          _totalEaringText(),
+          AddItemForm(),
+          Overview(),
+          Expanded(child: SalesListView()),
         ],
       ),
     );
   }
+}
 
-  Widget _enterSalaryTextField() {
-    return TextField(
-      controller: sallaryController,
-      decoration: InputDecoration(hintText: 'enter sallary'),
-    );
-  }
-
-  Widget _enterItemSoldTextField() {
-    return TextField(
-      controller: itemPriceController,
-      decoration: InputDecoration(hintText: 'enter sallary'),
-    );
-  }
-
-  Widget _addEntryButton() {
-    return InkWell(
-      onTap: () {
-        salesMan.itemPrice = double.parse(itemPriceController.text);
-
-        salesMan.addItemsInList(double.parse(sallaryController.text),
-            double.parse(itemPriceController.text));
-        salesMan.totalAmountOfItemsCalculated();
-        salesMan.calculateTotalEarning();
-
-        setState(() {});
+class AddItemForm extends StatelessWidget {
+  TextEditingController itemPriceController = TextEditingController();
+  TextEditingController salaryController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ScreenBloc, ScreenState>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            Text('Item Prices Form'),
+            TextFormField(
+              controller: salaryController,
+              decoration: InputDecoration(hintText: 'enter salary'),
+            ),
+            TextFormField(
+              controller: itemPriceController,
+              decoration: InputDecoration(hintText: 'enter item price'),
+            ),
+            MaterialButton(
+              child: Text('Add Item'),
+              color: Colors.blue,
+              onPressed: () {
+                context.read<ScreenBloc>().add(
+                      AddSaleEvent(
+                        itemPriceInput: itemPriceController.text,
+                        salaryInput: salaryController.text,
+                      ),
+                    );
+              },
+            )
+          ],
+        );
       },
-      child: Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.green,
-        ),
-        child: Text(
-          "add entry",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
     );
   }
+}
 
-  // Widget _showItemPrices() {
-  //   return Container(
-  //       padding: EdgeInsets.all(20),
-  //       decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-  //       child: Text(
-  //         'items price=' + salesMan.itemList.toString(),
-  //         style: TextStyle(fontSize: 20),
-  //       ));
-  // }
+class SalesListView extends StatelessWidget {
+  const SalesListView({Key? key}) : super(key: key);
 
-  Widget _commissionText() {
-    return Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-        child: Text(
-          '9% commission on total sale',
-          style: TextStyle(fontSize: 15),
-        ));
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ScreenBloc, ScreenState>(
+      builder: (_, state) {
+        return ListView.builder(
+          itemCount: state.itemPricesAdded.length,
+          itemBuilder: (_, index) {
+            return Text('${state.itemPricesAdded[index]}');
+          },
+        );
+      },
+    );
   }
+}
 
-  Widget _totalAmountOfItems() {
-    return Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-        child: Text(
-          'Total= ' + salesMan.totalAmountOfItemsCalculated().toString(),
-          style: TextStyle(fontSize: 20),
-        ));
-  }
+class Overview extends StatelessWidget {
+  const Overview({Key? key}) : super(key: key);
 
-  Widget _totalEaringText() {
-    return Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-        child: Text(
-          'Total Earning= ' + salesMan.calculateTotalEarning().toString(),
-          style: TextStyle(fontSize: 20),
-        ));
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ScreenBloc, ScreenState>(
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Overview'),
+            Text(
+                'weekly earning: ${SalesMan().weeklyEarning(state.totalSales())}')
+          ],
+        );
+      },
+    );
   }
 }
