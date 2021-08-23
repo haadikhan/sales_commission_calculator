@@ -1,8 +1,23 @@
 class SalesMan {
-  double sallaryPerWeek = 0;
-  double itemPrice = 2;
-  double totalEarning = 0;
+  double salaryPerWeek = 1;
+  double itemPrice = 1;
+  double totalEarning = 1;
+  double totalAmountOfItems = 1;
+  double commissionPerWeek = 1;
+  List<double> itemList = [2, 2];
+  void addItemsInList(salaryPerWeek, itemPrice) {
+    itemList.add(itemPrice);
+  }
 
-  double commissionPerWeek = 0;
-  var itemList = [];
+  double totalAmountOfItemsCalculated() {
+    totalAmountOfItems = itemList.reduce((value, element) => value + element);
+
+    return totalAmountOfItems;
+  }
+
+  double calculateTotalEarning() {
+    totalEarning = salaryPerWeek + (totalAmountOfItems * (0.09));
+
+    return totalEarning;
+  }
 }

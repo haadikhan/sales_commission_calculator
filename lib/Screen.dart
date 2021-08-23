@@ -10,6 +10,7 @@
 // 4 350.89
 // Develop a Java application that inputs one salesperson’s items sold for last week and calculates and
 // displays that salesperson’s earnings. There’s no limit to the number of items that can be sold.
+
 import 'package:flutter/material.dart   ';
 import 'package:sales_commission_calculator/sales_man.dart';
 
@@ -22,9 +23,7 @@ class _ScreenState extends State<Screen> {
   SalesMan salesMan = SalesMan();
   TextEditingController sallaryController = TextEditingController();
   TextEditingController itemPriceController = TextEditingController();
-  var itemList = [];
-  var items;
-  double totalAmountOfItems = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,97 +33,96 @@ class _ScreenState extends State<Screen> {
       body: Column(
         children: [
           const SizedBox(height: 20),
-          TextField(
-            controller: sallaryController,
-            decoration: InputDecoration(hintText: 'enter sallary'),
-          ),
-          TextField(
-            controller: itemPriceController,
-            decoration: InputDecoration(hintText: 'enter items sold'),
-          ),
+          _enterSalaryTextField(),
+          _enterItemSoldTextField(),
           const SizedBox(height: 20),
-          InkWell(
-            onTap: () {
-              salesMan.itemPrice = double.parse(itemPriceController.text);
-              salesMan.sallaryPerWeek = double.parse(sallaryController.text);
-              itemList.add(salesMan.itemPrice);
-              totalAmountCalculator();
-              _calculateTotalEarning();
-
-              setState(() {});
-            },
-            child: Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.green,
-              ),
-              child: Text("add entry"),
-            ),
-          ),
-          Container(
-              padding: EdgeInsets.all(20),
-              decoration:
-                  BoxDecoration(border: Border.all(color: Colors.black)),
-              child: Text(
-                '9% commission on total sale',
-                style: TextStyle(fontSize: 15),
-              )),
-          Container(
-              padding: EdgeInsets.all(20),
-              decoration:
-                  BoxDecoration(border: Border.all(color: Colors.black)),
-              child: Text(
-                'items price=' + itemList.toString(),
-                style: TextStyle(fontSize: 20),
-              )),
-          Container(
-              padding: EdgeInsets.all(20),
-              decoration:
-                  BoxDecoration(border: Border.all(color: Colors.black)),
-              child: Text(
-                'Total= ' + totalAmountOfItems.toString(),
-                // + totalAmountCalculator().toString(),
-                style: TextStyle(fontSize: 20),
-              )),
+          _addEntryButton(),
+          _commissionText(),
+          // _showItemPrices(),
+          _totalAmountOfItems(),
           const SizedBox(height: 20),
-          // InkWell(
-          //   onTap: () {
-          //                  setState(() {});
-          //   },
-          //   child: Container(
-          //     padding: EdgeInsets.all(20),
-          //     decoration: BoxDecoration(
-          //       color: Colors.green,
-          //     ),
-          //     child: Text(
-          //       'total earning of seller',
-          //       style:
-          //           TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          //     ),
-          //   ),
-          // ),
-          Container(
-              padding: EdgeInsets.all(20),
-              decoration:
-                  BoxDecoration(border: Border.all(color: Colors.black)),
-              child: Text(
-                'Total Earning= ' + _calculateTotalEarning().toString(),
-                style: TextStyle(fontSize: 20),
-              )),
+          _totalEaringText(),
         ],
       ),
     );
   }
 
-  double _calculateTotalEarning() {
-    salesMan.totalEarning =
-        salesMan.sallaryPerWeek + (totalAmountOfItems * (0.09));
-
-    return salesMan.totalEarning;
+  Widget _enterSalaryTextField() {
+    return TextField(
+      controller: sallaryController,
+      decoration: InputDecoration(hintText: 'enter sallary'),
+    );
   }
 
-  double totalAmountCalculator() {
-    totalAmountOfItems = itemList.reduce((value, element) => value + element);
-    return totalAmountOfItems;
+  Widget _enterItemSoldTextField() {
+    return TextField(
+      controller: itemPriceController,
+      decoration: InputDecoration(hintText: 'enter sallary'),
+    );
+  }
+
+  Widget _addEntryButton() {
+    return InkWell(
+      onTap: () {
+        salesMan.itemPrice = double.parse(itemPriceController.text);
+
+        salesMan.addItemsInList(double.parse(sallaryController.text),
+            double.parse(itemPriceController.text));
+        salesMan.totalAmountOfItemsCalculated();
+        salesMan.calculateTotalEarning();
+
+        setState(() {});
+      },
+      child: Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.green,
+        ),
+        child: Text(
+          "add entry",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  // Widget _showItemPrices() {
+  //   return Container(
+  //       padding: EdgeInsets.all(20),
+  //       decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+  //       child: Text(
+  //         'items price=' + salesMan.itemList.toString(),
+  //         style: TextStyle(fontSize: 20),
+  //       ));
+  // }
+
+  Widget _commissionText() {
+    return Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+        child: Text(
+          '9% commission on total sale',
+          style: TextStyle(fontSize: 15),
+        ));
+  }
+
+  Widget _totalAmountOfItems() {
+    return Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+        child: Text(
+          'Total= ' + salesMan.totalAmountOfItemsCalculated().toString(),
+          style: TextStyle(fontSize: 20),
+        ));
+  }
+
+  Widget _totalEaringText() {
+    return Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+        child: Text(
+          'Total Earning= ' + salesMan.calculateTotalEarning().toString(),
+          style: TextStyle(fontSize: 20),
+        ));
   }
 }
